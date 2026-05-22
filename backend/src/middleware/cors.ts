@@ -4,15 +4,22 @@ const allowedOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(",").map((s) => s.trim())
   : [];
 
-export default cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+const corsOptions: cors.CorsOptions = {
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+if (allowedOrigins.includes("*") || allowedOrigins.length === 0) {
+  corsOptions.origin = "*";
+} else {
+  corsOptions.origin = (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-});
+  };
+  corsOptions.credentials = true;
+}
+
+export default cors(corsOptions);

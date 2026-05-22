@@ -37,6 +37,7 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/auth", authRouter);
 
 app.use("/api", (req, res, next) => {
+  if (req.method === "OPTIONS") return next();
   if (req.path.startsWith("/auth/") || req.path === "/health") return next();
   authMiddleware(req as any, res, next);
 });

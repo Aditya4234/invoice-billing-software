@@ -7,6 +7,7 @@ import helmet from "helmet";
 import corsMiddleware from "./middleware/cors";
 import { errorHandler } from "./middleware/error";
 
+import User from "./models/User";
 import authRouter from "./routes/auth";
 import { authMiddleware } from "./middleware/auth";
 import invoicesRouter from "./routes/invoices";
@@ -60,10 +61,26 @@ app.use(errorHandler);
 
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/molyweb";
 
+async function seedAdmin() {
+  const existing = await User.findOne({ email: "admin@molyweb.com" });
+  if (!existing) {
+    await User.create({
+      email: "admin@molyweb.com",
+      password: "password123",
+      name: "Admin",
+      role: "admin",
+    });
+    console.log("Default admin user created (admin@molyweb.com / password123)");
+  } else {
+    console.log("Default admin user already exists");
+  }
+}
+
 mongoose
   .connect(MONGODB_URI)
-  .then(() => {
+  .then(async () => {
     console.log("Connected to MongoDB");
+    await seedAdmin();
     app.listen(PORT, () => {
       console.log(`MolyWeb API running at http://localhost:${PORT}`);
     });

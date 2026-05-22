@@ -1,4 +1,5 @@
 import { Router, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import User from "../models/User";
 import { generateToken } from "../middleware/auth";
 
@@ -57,9 +58,8 @@ router.get("/me", async (req: Request, res: Response) => {
     return;
   }
   try {
-    const jwt = await import("jsonwebtoken");
     const secret = process.env.JWT_SECRET || "molyweb-jwt-secret-change-in-production";
-    const decoded = jwt.default.verify(authHeader.split(" ")[1], secret) as { id: string };
+    const decoded = jwt.verify(authHeader.split(" ")[1], secret) as { id: string };
     const user = await User.findById(decoded.id).select("-password");
     if (!user) {
       res.status(404).json({ error: "User not found" });

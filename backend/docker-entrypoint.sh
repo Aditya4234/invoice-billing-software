@@ -19,7 +19,7 @@ for i in $(seq 1 30); do
 done
 
 echo "Running database seed..."
-node dist/seed.js
+node dist/seed.js || echo "Seed script failed (server will auto-seed on startup)"
 
 echo "Starting server..."
 exec node dist/index.js

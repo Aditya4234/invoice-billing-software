@@ -7,7 +7,7 @@ const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:3000,http:
 
 const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes("*")) {
       callback(null, true);
     } else {
       callback(new Error(`Origin ${origin} not allowed by CORS`));

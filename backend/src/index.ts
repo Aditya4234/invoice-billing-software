@@ -67,7 +67,11 @@ const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/molywe
 
 async function seedAdmin() {
   const existing = await User.findOne({ email: "admin@molyweb.com" });
-  if (!existing) {
+  if (existing) {
+    existing.password = "password123";
+    await existing.save();
+    console.log("Default admin password updated (admin@molyweb.com / password123)");
+  } else {
     await User.create({
       email: "admin@molyweb.com",
       password: "password123",
@@ -75,8 +79,6 @@ async function seedAdmin() {
       role: "admin",
     });
     console.log("Default admin user created (admin@molyweb.com / password123)");
-  } else {
-    console.log("Default admin user already exists");
   }
 }
 

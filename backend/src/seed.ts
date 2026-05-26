@@ -12,7 +12,9 @@ async function seed() {
 
   const existing = await User.findOne({ email: "admin@molyweb.com" });
   if (existing) {
-    console.log("Default admin user already exists");
+    existing.password = "password123";
+    await existing.save();
+    console.log("Default admin password updated (admin@molyweb.com / password123)");
   } else {
     await User.create({
       email: "admin@molyweb.com",

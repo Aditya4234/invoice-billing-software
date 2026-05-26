@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface ILeaveRequest extends Document {
   employeeId: string;
   employeeName: string;
-  type: "vacation" | "sick" | "personal" | "other";
+  type: "sick" | "casual" | "earned" | "maternity" | "paternity" | "unpaid";
   startDate: string;
   endDate: string;
   reason: string;
@@ -18,7 +18,7 @@ const LeaveRequestSchema = new Schema<ILeaveRequest>(
     employeeName: { type: String, required: true },
     type: {
       type: String,
-      enum: ["vacation", "sick", "personal", "other"],
+      enum: ["sick", "casual", "earned", "maternity", "paternity", "unpaid"],
       required: true,
     },
     startDate: { type: String, required: true },

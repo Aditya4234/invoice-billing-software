@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 export interface IInvoiceItem {
   description: string;
@@ -7,7 +7,8 @@ export interface IInvoiceItem {
   amount: number;
 }
 
-export interface IInvoice extends Document {
+export interface IInvoice {
+  _id: string;
   clientId: string;
   clientName: string;
   email: string;
@@ -33,7 +34,8 @@ const InvoiceItemSchema = new Schema<IInvoiceItem>(
 
 const InvoiceSchema = new Schema<IInvoice>(
   {
-    clientId: { type: String, required: true },
+    _id: { type: String },
+    clientId: { type: String, default: "" },
     clientName: { type: String, required: true },
     email: { type: String, required: true },
     amount: { type: Number, required: true },
@@ -50,6 +52,6 @@ const InvoiceSchema = new Schema<IInvoice>(
   { timestamps: true }
 );
 
-InvoiceSchema.index({ clientName: "text", id: "text", email: "text" });
+InvoiceSchema.index({ clientName: "text", _id: "text", email: "text" });
 
 export default mongoose.model<IInvoice>("Invoice", InvoiceSchema);

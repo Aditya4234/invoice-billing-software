@@ -39,7 +39,7 @@ app.use("/api/auth", authRouter);
 
 app.use("/api", (req, res, next) => {
   if (req.method === "OPTIONS") return next();
-  if (req.path.startsWith("/auth/") || req.path === "/health") return next();
+  if (req.path === "/auth" || req.path.startsWith("/auth/") || req.path === "/health") return next();
   authMiddleware(req as any, res, next);
 });
 
@@ -56,6 +56,10 @@ app.use("/api/billing", billingRouter);
 app.use("/api/stats", statsRouter);
 app.use("/api/activities", activitiesRouter);
 app.use("/api/reports", reportsRouter);
+
+app.use("/api/*", (_req, res) => {
+  res.status(404).json({ error: "API route not found" });
+});
 
 app.use(errorHandler);
 

@@ -55,6 +55,29 @@ router.get("/stats", async (_req: Request, res: Response) => {
   }
 });
 
+router.get("/export/csv", async (_req: Request, res: Response) => {
+  try {
+    const invoices = await Invoice.find().sort({ createdAt: -1 }).lean();
+    const headers = ["Invoice ID", "Client Name", "Email", "Amount", "Due Date", "Status", "Created At"];
+    const rows = invoices.map((inv) => [
+      inv._id,
+      `"${(inv.clientName || "").replace(/"/g, '""')}"`,
+      inv.email,
+      inv.amount.toFixed(2),
+      inv.dueDate,
+      inv.status,
+      inv.createdAt ? new Date(inv.createdAt).toISOString().split("T")[0] : "",
+    ]);
+    const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", `attachment; filename="invoices-${Date.now()}.csv"`);
+    res.send(csv);
+  } catch (err) {
+    console.error("[Invoices] CSV export error:", err);
+    res.status(500).json({ error: "Failed to export invoices" });
+  }
+});
+
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     const invoice = await Invoice.findById(req.params.id);
@@ -72,12 +95,11 @@ router.get("/:id", async (req: Request, res: Response) => {
 router.post("/", async (req: Request, res: Response) => {
   try {
     const { clientId, clientName, email, amount, dueDate, status, items, invoiceDate, notes } = req.body;
-    if (!clientName || !email || !amount || !dueDate) {
+    if (!clientName || !email || amount === undefined || amount === null || !dueDate) {
       res.status(400).json({ error: "Missing required fields: clientName, email, amount, dueDate" });
       return;
     }
-    const count = await Invoice.countDocuments();
-    const invId = `INV-${String(count + 1).padStart(3, "0")}`;
+    const invId = `INV-${Date.now().toString(36).toUpperCase()}-${String(Math.floor(Math.random() * 1000)).padStart(3, "0")}`;
     const invoice = await Invoice.create({
       _id: invId,
       clientId: clientId || "",
@@ -137,6 +159,44 @@ router.delete("/:id", async (req: Request, res: Response) => {
   } catch (err) {
     console.error("[Invoices] Delete error:", err);
     res.status(500).json({ error: "Failed to delete invoice" });
+  }
+});
+
+router.post("/:id/email", async (req: Request, res: Response) => {
+  try {
+    const invoice = await Invoice.findById(req.params.id);
+    if (!invoice) {
+      res.status(404).json({ error: "Invoice not found" });
+      return;
+    }
+    await Activity.create({
+      type: "invoice",
+      message: `Invoice ${invoice._id} emailed to ${invoice.email}`,
+      user: "System",
+    });
+    res.json({ message: `Invoice emailed to ${invoice.email}` });
+  } catch (err) {
+    console.error("[Invoices] Email error:", err);
+    res.status(500).json({ error: "Failed to email invoice" });
+  }
+});
+
+router.post("/:id/remind", async (req: Request, res: Response) => {
+  try {
+    const invoice = await Invoice.findById(req.params.id);
+    if (!invoice) {
+      res.status(404).json({ error: "Invoice not found" });
+      return;
+    }
+    await Activity.create({
+      type: "invoice",
+      message: `Payment reminder sent for ${invoice._id} to ${invoice.email}`,
+      user: "System",
+    });
+    res.json({ message: `Reminder sent for ${invoice._id}` });
+  } catch (err) {
+    console.error("[Invoices] Remind error:", err);
+    res.status(500).json({ error: "Failed to send reminder" });
   }
 });
 

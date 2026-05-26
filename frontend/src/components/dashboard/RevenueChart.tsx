@@ -59,7 +59,7 @@ export default function RevenueChart({ data }: RevenueChartProps) {
       </div>
 
       <div className="mt-4 lg:mt-6 h-[220px] lg:h-[300px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minHeight={220}>
           {view === "revenue" ? (
             <AreaChart data={data}>
               <defs>

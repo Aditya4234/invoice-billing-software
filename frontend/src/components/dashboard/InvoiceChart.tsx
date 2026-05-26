@@ -44,7 +44,7 @@ export default function InvoiceChart() {
       <p className="mt-1 text-sm text-gray-500">Monthly invoice volume & growth rate</p>
 
       <div className="mt-4 lg:mt-6 h-[200px] lg:h-[260px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minHeight={200}>
           <BarChart data={data} barGap={4}>
             <defs>
               <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">

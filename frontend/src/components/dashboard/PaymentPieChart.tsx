@@ -32,7 +32,7 @@ export default function PaymentPieChart({ data }: PaymentPieChartProps) {
       <p className="mt-1 text-sm text-gray-500">Invoice payment status breakdown</p>
 
       <div className="mt-4 h-[200px] lg:h-[260px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minHeight={200}>
           <PieChart>
             <Pie
               data={data}

@@ -12,7 +12,11 @@ export interface IInvoice {
   clientId: string;
   clientName: string;
   email: string;
+  clientAddress?: string;
+  clientCity?: string;
+  clientState?: string;
   amount: number;
+  paidAmount?: number;
   dueDate: string;
   status: "paid" | "pending" | "overdue" | "draft";
   items: IInvoiceItem[];
@@ -38,7 +42,11 @@ const InvoiceSchema = new Schema<IInvoice>(
     clientId: { type: String, default: "" },
     clientName: { type: String, required: true },
     email: { type: String, required: true },
+    clientAddress: { type: String, default: "" },
+    clientCity: { type: String, default: "" },
+    clientState: { type: String, default: "" },
     amount: { type: Number, required: true },
+    paidAmount: { type: Number, default: 0 },
     dueDate: { type: String, required: true },
     status: {
       type: String,
@@ -49,7 +57,18 @@ const InvoiceSchema = new Schema<IInvoice>(
     invoiceDate: { type: String },
     notes: { type: String },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform(_doc, ret: Record<string, unknown>) {
+        ret.id = String(ret._id);
+        delete ret.__v;
+        delete ret._id;
+        return ret;
+      },
+    },
+  }
 );
 
 InvoiceSchema.index({ clientName: "text", _id: "text", email: "text" });

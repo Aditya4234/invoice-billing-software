@@ -34,7 +34,7 @@ export default function DepartmentsPage() {
         firstName: b.firstName,
         lastName: b.lastName,
         departmentId: b.departmentId || b.department, // just for UI matching
-        status: b.status === "on-leave" ? "active" : b.status,
+        status: b.status,
         designation: b.position,
       } as Employee)));
     });

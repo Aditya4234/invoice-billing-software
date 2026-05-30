@@ -30,7 +30,18 @@ const BillingPlanSchema = new Schema<IBillingPlan>(
     startDate: { type: String, required: true },
     endDate: { type: String, required: true },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform(_doc, ret: Record<string, unknown>) {
+        ret.id = String(ret._id);
+        delete ret.__v;
+        delete ret._id;
+        return ret;
+      },
+    },
+  }
 );
 
 export default mongoose.model<IBillingPlan>("BillingPlan", BillingPlanSchema);

@@ -32,7 +32,7 @@ export default function RegisterEmployeePage() {
     basic: "", hra: "", da: "", travelAllowance: "", medicalAllowance: "", specialAllowance: "",
     accountNumber: "", ifsc: "", bankName: "", branch: "",
     pan: "", aadhar: "", uan: "",
-
+    createLogin: false, password: "",
   });
   const [submitted, setSubmitted] = useState(false);
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -41,7 +41,7 @@ export default function RegisterEmployeePage() {
     getApiData(() => getDepartments(), []).then(setDepartments);
   }, []);
 
-  const update = (field: string, value: string) => setForm((prev) => ({ ...prev, [field]: value }));
+  const update = (field: string, value: string | boolean) => setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,6 +61,8 @@ export default function RegisterEmployeePage() {
         address: [form.address, form.city, form.state, form.pincode].filter(Boolean).join(", "),
         bankAccount: form.accountNumber,
         ifscCode: form.ifsc,
+        createLogin: form.createLogin,
+        password: form.password,
       });
       setSubmitted(true);
       setTimeout(() => router.push("/employees"), 1500);
@@ -184,6 +186,21 @@ export default function RegisterEmployeePage() {
                   </div>
                 </div>
               </div>
+
+              <div className="mt-6 border-t border-gray-100 pt-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <input type="checkbox" id="createLogin" checked={form.createLogin} onChange={(e) => update("createLogin", e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
+                  <label htmlFor="createLogin" className="text-sm font-medium text-gray-900">Create Login Account for this Employee</label>
+                </div>
+                {form.createLogin && (
+                  <div className="space-y-1.5 max-w-sm">
+                    <label className={labelClass}>Login Password *</label>
+                    <input required={form.createLogin} type="password" minLength={6} className={inputClass} placeholder="Set a temporary password" value={form.password} onChange={(e) => update("password", e.target.value)} />
+                    <p className="text-xs text-gray-500 mt-1">The employee can log in using their Email ID and this password.</p>
+                  </div>
+                )}
+              </div>
+
 
             </div>
           )}

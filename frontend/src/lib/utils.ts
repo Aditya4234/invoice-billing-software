@@ -39,8 +39,7 @@ export function getStatusColor(status: string): string {
     case "pending": return "bg-amber-50 text-amber-700 ring-amber-600/20";
     case "overdue": return "bg-rose-50 text-rose-700 ring-rose-600/20";
     case "draft": return "bg-slate-50 text-slate-600 ring-slate-500/20";
-    case "cancelled": return "bg-gray-50 text-gray-600 ring-gray-500/20";
-    default: return "bg-gray-50 text-gray-600 ring-gray-500/20";
+        default: return "bg-gray-50 text-gray-600 ring-gray-500/20";
   }
 }
 

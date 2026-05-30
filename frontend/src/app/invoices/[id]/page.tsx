@@ -84,8 +84,8 @@ export default function InvoiceDetailPage() {
         const grandTotal = subtotal + cgstTotal + sgstTotal;
 
         setInvoice({
-          id: res._id || res.id,
-          number: res._id || res.id || `INV-${Date.now()}`,
+          id: res.id,
+          number: res.id || `INV-${Date.now()}`,
           date: res.invoiceDate || res.createdAt,
           dueDate: res.dueDate,
           terms: "Net 15",

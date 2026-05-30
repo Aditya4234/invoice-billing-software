@@ -269,7 +269,7 @@ export default function InvoicesPage() {
                 </motion.tr>
               ))}
               {paginated.length === 0 && (
-                <tr>
+                <tr key="empty-state">
                   <td colSpan={6} className="px-6 py-16 text-center">
                     <p className="text-sm text-gray-500">No invoices found</p>
                   </td>

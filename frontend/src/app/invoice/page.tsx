@@ -81,17 +81,19 @@ const INVOICE = {
   paidAmount: 25000,
   balanceDue: 49930,
   notes:
-    "Payment is due within 15 days from the date of invoice.\n" +
-    "Please include the invoice number with your payment.\n" +
-    "Bank transfer details will be provided upon request.\n" +
-    "For any queries, contact our billing department at accounts@molyweb.com",
+    "Thank you for choosing MOLYWEB DIGITAL SOLUTIONS PVT. LTD. We appreciate your business and look forward to serving you again. For any support or queries, feel free to contact us.",
   termsConditions:
-    "1. Services will commence after receipt of advance payment.\n" +
-    "2. Delivery timeline: 4-6 weeks from project kickoff.\n" +
-    "3. Late payment attracts 2% interest per month on outstanding amount.\n" +
-    "4. All disputes subject to Lucknow jurisdiction.\n" +
-    "5. Support included for 30 days post-delivery.\n" +
-    "6. Refund policy as per company terms and conditions.",
+    "Payment is due within 7 days from the invoice date.\n" +
+    "A 50% advance payment is required before project initiation.\n" +
+    "Final files/source code will be delivered after full payment clearance.\n" +
+    "Any additional changes outside the agreed scope may incur extra charges.\n" +
+    "Late payments may result in project delay or temporary service suspension.\n" +
+    "All payments made are non-refundable once the work has started.\n" +
+    "Client is responsible for providing all required content and approvals on time.\n" +
+    "Ownership of the project will be transferred to the client after complete payment.\n" +
+    "This invoice is electronically generated and does not require a physical signature.\n" +
+    "For any queries related to this invoice, contact us at sales@molyweb.com",
+  amountInWords: "Indian Rupee Seventy Four Thousand Nine Hundred Thirty Only",
 };
 
 export default function InvoicePage() {
@@ -176,74 +178,95 @@ export default function InvoicePage() {
 
 function InvoiceContent() {
   return (
-    <>
-      <InvoiceHeader company={COMPANY} invoiceNumber={INVOICE.number} />
+    <div className="border border-gray-400 font-serif text-gray-900">
+      <div className="p-4">
+        <InvoiceHeader company={COMPANY} />
+      </div>
 
-      <div className="grid grid-cols-2 gap-6 mb-5">
-        <div className="border border-gray-300 rounded-sm p-3">
-          <h3 className="text-xs font-semibold text-gray-800 mb-2 pb-1.5 border-b border-gray-200">
-            Invoice Details
-          </h3>
-          <div className="space-y-1 text-[11px]">
-            <div className="flex justify-between">
-              <span className="text-gray-500">Invoice Number</span>
-              <span className="font-medium text-gray-900">{INVOICE.number}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">Invoice Date</span>
-              <span className="font-medium text-gray-900">{formatDate(INVOICE.date)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">Terms</span>
-              <span className="font-medium text-gray-900">{INVOICE.terms}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">Due Date</span>
-              <span className="font-medium text-gray-900">{formatDate(INVOICE.dueDate)}</span>
-            </div>
-          </div>
+      <div className="grid grid-cols-2 border-y border-gray-400">
+        <div className="p-2 border-r border-gray-400">
+          <table className="w-full text-[11px]">
+            <tbody>
+              <tr>
+                <td className="w-28 text-gray-600 pb-0.5">#</td>
+                <td className="pb-0.5 font-bold">: {INVOICE.number}</td>
+              </tr>
+              <tr>
+                <td className="text-gray-600 pb-0.5">Invoice Date</td>
+                <td className="pb-0.5 font-bold">: {formatDate(INVOICE.date)}</td>
+              </tr>
+              <tr>
+                <td className="text-gray-600 pb-0.5">Terms</td>
+                <td className="pb-0.5 font-bold">: {INVOICE.terms}</td>
+              </tr>
+              <tr>
+                <td className="text-gray-600">Due Date</td>
+                <td className="font-bold">: {formatDate(INVOICE.dueDate)}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div className="border border-gray-300 rounded-sm p-3">
-          <h3 className="text-xs font-semibold text-gray-800 mb-2 pb-1.5 border-b border-gray-200">
-            Place Of Supply
-          </h3>
-          <p className="text-[11px] font-medium text-gray-900 mt-2">{INVOICE.placeOfSupply}</p>
+        <div className="p-2">
+          <table className="w-full text-[11px]">
+            <tbody>
+              <tr>
+                <td className="w-32 text-gray-600 align-top">Place Of Supply</td>
+                <td className="font-bold align-top">: {INVOICE.placeOfSupply}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <div className="border border-gray-300 rounded-sm p-3 mb-5">
-        <h3 className="text-xs font-semibold text-gray-800 mb-2 pb-1.5 border-b border-gray-200">Bill To</h3>
-        <p className="text-sm font-semibold text-gray-900">{INVOICE.customer.name}</p>
-        <p className="text-[11px] text-gray-600 mt-0.5">
-          {INVOICE.customer.address}, {INVOICE.customer.city}, {INVOICE.customer.state} - {INVOICE.customer.country}
+      <div className="border-b border-gray-400 p-2 bg-gray-100/50">
+        <h3 className="text-[11px] font-bold text-gray-800 mb-1">Bill To</h3>
+      </div>
+      <div className="border-b border-gray-400 p-2">
+        <p className="text-[12px] font-bold text-gray-900">{INVOICE.customer.name}</p>
+        <p className="text-[11px] text-gray-800 mt-1 leading-snug">
+          {INVOICE.customer.address}<br />
+          {INVOICE.customer.city}<br />
+          {INVOICE.customer.state}<br />
+          {COMPANY.pincode} {INVOICE.customer.state}<br />
+          {INVOICE.customer.country}
         </p>
       </div>
 
-      <div className="border border-gray-300 rounded-sm p-3 mb-5">
-        <h3 className="text-xs font-semibold text-gray-800 mb-1">Subject</h3>
-        <p className="text-[11px] font-medium text-gray-900">{INVOICE.subject}</p>
+      <div className="border-b border-gray-400 p-2">
+        <table className="w-full text-[11px]">
+          <tbody>
+            <tr>
+              <td className="w-24 text-gray-600 pb-1">Subject :</td>
+            </tr>
+            <tr>
+              <td className="font-medium text-gray-900">{INVOICE.subject}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <div className="mb-5">
+      <div>
         <InvoiceTable items={ITEMS} />
       </div>
 
-      <div className="mb-5">
-        <InvoiceSummary
-          subtotal={INVOICE.subtotal}
-          cgstTotal={INVOICE.cgstTotal}
-          sgstTotal={INVOICE.sgstTotal}
-          grandTotal={INVOICE.grandTotal}
-          paidAmount={INVOICE.paidAmount}
-          balanceDue={INVOICE.balanceDue}
-        />
+      <div className="flex border-t border-gray-400">
+        <div className="w-[60%] border-r border-gray-400">
+          <InvoiceNotes notes={INVOICE.notes} termsConditions={INVOICE.termsConditions} amountInWords={INVOICE.amountInWords} />
+        </div>
+        <div className="w-[40%] flex flex-col">
+          <InvoiceSummary
+            subtotal={INVOICE.subtotal}
+            cgstTotal={INVOICE.cgstTotal}
+            sgstTotal={INVOICE.sgstTotal}
+            grandTotal={INVOICE.grandTotal}
+            paidAmount={INVOICE.paidAmount}
+            balanceDue={INVOICE.balanceDue}
+          />
+          <div className="mt-auto border-t border-gray-400">
+            <SignatureSection />
+          </div>
+        </div>
       </div>
-
-      <div className="mb-4">
-        <InvoiceNotes notes={INVOICE.notes} termsConditions={INVOICE.termsConditions} />
-      </div>
-
-      <SignatureSection />
-    </>
+    </div>
   );
 }

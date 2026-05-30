@@ -94,7 +94,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 router.post("/", async (req: Request, res: Response) => {
   try {
-    const { clientId, clientName, email, amount, dueDate, status, items, invoiceDate, notes } = req.body;
+    const { clientId, clientName, email, clientAddress, clientCity, clientState, amount, paidAmount, dueDate, status, items, invoiceDate, notes } = req.body;
     if (!clientName || !email || amount === undefined || amount === null || !dueDate) {
       res.status(400).json({ error: "Missing required fields: clientName, email, amount, dueDate" });
       return;
@@ -105,7 +105,11 @@ router.post("/", async (req: Request, res: Response) => {
       clientId: clientId || "",
       clientName,
       email,
+      clientAddress: clientAddress || "",
+      clientCity: clientCity || "",
+      clientState: clientState || "",
       amount: parseFloat(amount),
+      paidAmount: parseFloat(paidAmount) || 0,
       dueDate,
       status: status || "draft",
       items: items || [],

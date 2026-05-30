@@ -18,7 +18,18 @@ const DepartmentSchema = new Schema<IDepartment>(
     budget: { type: Number, required: true },
     status: { type: String, enum: ["active", "inactive"], default: "active" },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform(_doc, ret: Record<string, unknown>) {
+        ret.id = String(ret._id);
+        delete ret.__v;
+        delete ret._id;
+        return ret;
+      },
+    },
+  }
 );
 
 export default mongoose.model<IDepartment>("Department", DepartmentSchema);

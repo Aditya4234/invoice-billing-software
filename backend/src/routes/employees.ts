@@ -3,6 +3,7 @@ import Employee from "../models/Employee";
 import Department from "../models/Department";
 import Activity from "../models/Activity";
 import Payroll from "../models/Payroll";
+import User from "../models/User";
 
 const router = Router();
 
@@ -81,11 +82,13 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 router.post("/", async (req: Request, res: Response) => {
   try {
-    const { firstName, lastName, email, phone, department, position, salary, status, joinDate, address, bankAccount, ifscCode } = req.body;
+    const { firstName, lastName, email, phone, department, position, salary, status, joinDate, address, bankAccount, ifscCode, createLogin, password } = req.body;
     if (!firstName || !lastName || !email) {
       res.status(400).json({ error: "Missing required fields: firstName, lastName, email" });
       return;
     }
+    
+    // Create Employee record
     const employee = await Employee.create({
       firstName, lastName, email, phone: phone || "",
       department: department || "General", position: position || "",
@@ -93,10 +96,25 @@ router.post("/", async (req: Request, res: Response) => {
       joinDate: joinDate || new Date().toISOString().split("T")[0],
       address: address || "", bankAccount, ifscCode,
     });
+
     const dept = await Department.findOne({ name: employee.department });
     if (dept) {
       await Department.findByIdAndUpdate(dept._id, { $inc: { employeeCount: 1 } });
     }
+
+    // Optionally create User login
+    if (createLogin && password) {
+      const existingUser = await User.findOne({ email: email.toLowerCase() });
+      if (!existingUser) {
+        await User.create({
+          email: email.toLowerCase(),
+          password,
+          name: `${firstName} ${lastName}`,
+          role: "user",
+        });
+      }
+    }
+
     await Activity.create({
       type: "employee",
       message: `New employee joined: ${employee.firstName} ${employee.lastName} (${employee.department})`,

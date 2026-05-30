@@ -4,38 +4,85 @@ import Client from "../models/Client";
 import Employee from "../models/Employee";
 import Department from "../models/Department";
 import Payroll from "../models/Payroll";
+import Payment from "../models/Payment";
+import BillingPlan from "../models/BillingPlan";
 
 const router = Router();
 
-router.get("/", (_req: Request, res: Response) => {
-  res.json([
-    { label: "Total Revenue", value: "$284,500", change: "+12.5%", trend: "up", icon: "DollarSign", prefix: "", suffix: "" },
-    { label: "Paid Invoices", value: "1,842", change: "+8.2%", trend: "up", icon: "CheckCircle", prefix: "", suffix: "" },
-    { label: "Pending Payments", value: "$48,200", change: "-3.1%", trend: "down", icon: "Clock", prefix: "", suffix: "" },
-    { label: "Overdue Invoices", value: "$22,300", change: "+2.4%", trend: "down", icon: "AlertTriangle", prefix: "", suffix: "" },
-    { label: "Active Clients", value: "573", change: "+18.7%", trend: "up", icon: "Users", prefix: "", suffix: "" },
-    { label: "Monthly Profit", value: "$27,000", change: "+15.3%", trend: "up", icon: "TrendingUp", prefix: "", suffix: "" },
-  ]);
+router.get("/", async (_req: Request, res: Response) => {
+  try {
+    const [allInvoices, allPayments, allClients] = await Promise.all([
+      Invoice.find(),
+      Payment.find(),
+      Client.find({ status: "active" }),
+    ]);
+    const totalRevenue = allInvoices.filter((i) => i.status === "paid").reduce((s, i) => s + i.amount, 0);
+    const paidCount = allInvoices.filter((i) => i.status === "paid").length;
+    const pendingAmt = allInvoices.filter((i) => i.status === "pending").reduce((s, i) => s + i.amount, 0);
+    const overdueAmt = allInvoices.filter((i) => i.status === "overdue").reduce((s, i) => s + i.amount, 0);
+    const profit = totalRevenue - pendingAmt - overdueAmt;
+    res.json([
+      { label: "Total Revenue", value: `$${totalRevenue.toLocaleString()}`, change: "+12.5%", trend: "up", icon: "DollarSign", prefix: "", suffix: "" },
+      { label: "Paid Invoices", value: String(paidCount), change: "+8.2%", trend: "up", icon: "CheckCircle", prefix: "", suffix: "" },
+      { label: "Pending Payments", value: `$${pendingAmt.toLocaleString()}`, change: "-3.1%", trend: "down", icon: "Clock", prefix: "", suffix: "" },
+      { label: "Overdue Invoices", value: `$${overdueAmt.toLocaleString()}`, change: "+2.4%", trend: "down", icon: "AlertTriangle", prefix: "", suffix: "" },
+      { label: "Active Clients", value: String(allClients.length), change: "+18.7%", trend: "up", icon: "Users", prefix: "", suffix: "" },
+      { label: "Monthly Profit", value: `$${profit.toLocaleString()}`, change: "+15.3%", trend: "up", icon: "TrendingUp", prefix: "", suffix: "" },
+    ]);
+  } catch (err) {
+    console.error("[Stats] Error:", err);
+    res.status(500).json({ error: "Failed to fetch stats" });
+  }
 });
 
-router.get("/revenue", (_req: Request, res: Response) => {
-  res.json([
-    { month: "Jan", revenue: 28500, expenses: 12000, profit: 16500 },
-    { month: "Feb", revenue: 32200, expenses: 13500, profit: 18700 },
-    { month: "Mar", revenue: 29800, expenses: 11000, profit: 18800 },
-    { month: "Apr", revenue: 35600, expenses: 14200, profit: 21400 },
-    { month: "May", revenue: 42800, expenses: 15800, profit: 27000 },
-    { month: "Jun", revenue: 39500, expenses: 14500, profit: 25000 },
-  ]);
+router.get("/revenue", async (_req: Request, res: Response) => {
+  try {
+    const invoices = await Invoice.find();
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthlyMap: Record<string, { revenue: number; expenses: number }> = {};
+    for (const inv of invoices) {
+      const month = inv.invoiceDate ? new Date(inv.invoiceDate).getMonth() : new Date().getMonth();
+      const key = monthNames[month];
+      if (!monthlyMap[key]) monthlyMap[key] = { revenue: 0, expenses: 0 };
+      if (inv.status === "paid") monthlyMap[key].revenue += inv.amount;
+      monthlyMap[key].expenses += Math.round(inv.amount * 0.35);
+    }
+    for (const name of monthNames) {
+      if (!monthlyMap[name]) monthlyMap[name] = { revenue: 0, expenses: 0 };
+    }
+    const result = Object.entries(monthlyMap).map(([month, data]) => ({
+      month,
+      revenue: data.revenue,
+      expenses: data.expenses,
+      profit: data.revenue - data.expenses,
+    }));
+    result.sort((a, b) => monthNames.indexOf(a.month) - monthNames.indexOf(b.month));
+    res.json(result.filter((r) => r.revenue > 0 || monthNames.indexOf(r.month) <= new Date().getMonth()));
+  } catch (err) {
+    console.error("[Stats] Revenue error:", err);
+    res.status(500).json({ error: "Failed to fetch revenue data" });
+  }
 });
 
-router.get("/payment-status", (_req: Request, res: Response) => {
-  res.json([
-    { label: "Paid", value: 65, color: "#10b981", amount: 184900 },
-    { label: "Pending", value: 20, color: "#f59e0b", amount: 57000 },
-    { label: "Overdue", value: 10, color: "#ef4444", amount: 32100 },
-    { label: "Draft", value: 5, color: "#9ca3af", amount: 9900 },
-  ]);
+router.get("/payment-status", async (_req: Request, res: Response) => {
+  try {
+    const invoices = await Invoice.find();
+    const paidAmt = invoices.filter((i) => i.status === "paid").reduce((s, i) => s + i.amount, 0);
+    const pendingAmt = invoices.filter((i) => i.status === "pending").reduce((s, i) => s + i.amount, 0);
+    const overdueAmt = invoices.filter((i) => i.status === "overdue").reduce((s, i) => s + i.amount, 0);
+    const draftAmt = invoices.filter((i) => i.status === "draft").reduce((s, i) => s + i.amount, 0);
+    const total = paidAmt + pendingAmt + overdueAmt + draftAmt;
+    const toPercent = (v: number) => (total > 0 ? Math.round((v / total) * 100) : 0);
+    res.json([
+      { label: "Paid", value: toPercent(paidAmt), color: "#10b981", amount: paidAmt },
+      { label: "Pending", value: toPercent(pendingAmt), color: "#f59e0b", amount: pendingAmt },
+      { label: "Overdue", value: toPercent(overdueAmt), color: "#ef4444", amount: overdueAmt },
+      { label: "Draft", value: toPercent(draftAmt), color: "#9ca3af", amount: draftAmt },
+    ]);
+  } catch (err) {
+    console.error("[Stats] Payment status error:", err);
+    res.status(500).json({ error: "Failed to fetch payment status" });
+  }
 });
 
 router.get("/invoices", async (_req: Request, res: Response) => {

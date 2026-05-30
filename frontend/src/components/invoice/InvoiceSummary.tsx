@@ -9,25 +9,25 @@ interface Props {
 
 export function InvoiceSummary({ subtotal, cgstTotal, sgstTotal, grandTotal, paidAmount, balanceDue }: Props) {
   const rows = [
-    { label: "Sub Total", value: subtotal, bold: false, highlight: false },
-    { label: "CGST @ 9%", value: cgstTotal, bold: false, highlight: false },
-    { label: "SGST @ 9%", value: sgstTotal, bold: false, highlight: false },
-    { label: "Total", value: grandTotal, bold: true, highlight: true },
-    { label: "Payment Made", value: paidAmount, bold: false, highlight: false },
-    { label: "Balance Due", value: balanceDue, bold: true, highlight: true },
+    { label: "Sub Total", value: subtotal, bold: false, isRed: false },
+    { label: "CGST9 (9%)", value: cgstTotal, bold: false, isRed: false },
+    { label: "SGST9 (9%)", value: sgstTotal, bold: false, isRed: false },
+    { label: "Total", value: grandTotal, bold: true, isRed: false },
+    { label: "Payment Made", value: paidAmount, bold: false, isRed: true },
+    { label: "Balance Due", value: balanceDue, bold: true, isRed: false },
   ];
 
   return (
-    <div className="border border-gray-300 rounded-sm w-full max-w-xs ml-auto max-sm:max-w-full">
+    <div className="w-full">
       <table className="w-full text-[11px]">
         <tbody>
           {rows.map((row) => (
-            <tr key={row.label} className={row.highlight ? "bg-gray-50" : ""}>
-              <td className={`px-3 py-1.5 ${row.bold ? "font-semibold text-gray-800" : "text-gray-600"}`}>
+            <tr key={row.label}>
+              <td className={`px-2 py-1 text-right ${row.bold ? "font-bold text-gray-900" : "text-gray-700"}`}>
                 {row.label}
               </td>
-              <td className={`px-3 py-1.5 text-right ${row.bold ? "font-bold text-gray-900" : "text-gray-700"}`}>
-                ₹{row.value.toFixed(2)}
+              <td className={`px-2 py-1 text-right w-24 ${row.bold ? "font-bold" : ""} ${row.isRed ? "text-red-600" : "text-gray-900"}`}>
+                {row.isRed ? `(-) ` : ""}{row.value.toLocaleString('en-IN', {minimumFractionDigits: 2})}
               </td>
             </tr>
           ))}

@@ -7,14 +7,17 @@ const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:3000,http:
 
 const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes("*")) {
+    // Allow all origins in development, otherwise check allowedOrigins
+    if (process.env.NODE_ENV !== "production") {
+      callback(null, true);
+    } else if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes("*")) {
       callback(null, true);
     } else {
       callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
   },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
   credentials: true,
 };
 

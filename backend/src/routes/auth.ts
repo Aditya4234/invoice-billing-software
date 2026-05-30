@@ -34,12 +34,15 @@ router.post("/login", async (req: Request, res: Response) => {
       res.status(400).json({ error: "Missing required fields: email, password" });
       return;
     }
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPassword = password.trim();
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       res.status(401).json({ error: "Invalid email or password" });
       return;
     }
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await user.comparePassword(normalizedPassword);
+
     if (!isMatch) {
       res.status(401).json({ error: "Invalid email or password" });
       return;

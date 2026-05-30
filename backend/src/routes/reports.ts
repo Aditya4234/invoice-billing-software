@@ -8,14 +8,23 @@ const router = Router();
 
 router.get("/revenue", async (req: Request, res: Response) => {
   try {
-    const monthlyData = [
-      { month: "Jan", revenue: 28500, expenses: 12000 },
-      { month: "Feb", revenue: 32200, expenses: 13500 },
-      { month: "Mar", revenue: 29800, expenses: 11000 },
-      { month: "Apr", revenue: 35600, expenses: 14200 },
-      { month: "May", revenue: 42800, expenses: 15800 },
-      { month: "Jun", revenue: 39500, expenses: 14500 },
-    ];
+    const invoices = await Invoice.find();
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthlyMap: Record<string, { revenue: number; expenses: number }> = {};
+    for (const inv of invoices) {
+      const month = inv.invoiceDate ? new Date(inv.invoiceDate).getMonth() : new Date().getMonth();
+      const key = monthNames[month];
+      if (!monthlyMap[key]) monthlyMap[key] = { revenue: 0, expenses: 0 };
+      if (inv.status === "paid") monthlyMap[key].revenue += inv.amount;
+      monthlyMap[key].expenses += Math.round(inv.amount * 0.35);
+    }
+    for (const name of monthNames) {
+      if (!monthlyMap[name]) monthlyMap[name] = { revenue: 0, expenses: 0 };
+    }
+    let monthlyData = Object.entries(monthlyMap).map(([label, data]) => ({ label, revenue: data.revenue, expenses: data.expenses }));
+    monthlyData.sort((a, b) => monthNames.indexOf(a.label) - monthNames.indexOf(b.label));
+    monthlyData = monthlyData.filter((r) => r.revenue > 0 || monthNames.indexOf(r.label) <= new Date().getMonth());
+
     const period = (req.query.period as "monthly" | "quarterly" | "yearly") || "monthly";
     if (period === "quarterly") {
       const quarters = ["Q1", "Q2", "Q3", "Q4"];
@@ -29,10 +38,10 @@ router.get("/revenue", async (req: Request, res: Response) => {
     if (period === "yearly") {
       const totalRev = monthlyData.reduce((s, m) => s + m.revenue, 0);
       const totalExp = monthlyData.reduce((s, m) => s + m.expenses, 0);
-      res.json([{ label: "2026", revenue: totalRev, expenses: totalExp }]);
+      res.json([{ label: String(new Date().getFullYear()), revenue: totalRev, expenses: totalExp }]);
       return;
     }
-    res.json(monthlyData.map((m) => ({ label: m.month, revenue: m.revenue, expenses: m.expenses })));
+    res.json(monthlyData);
   } catch (err) {
     console.error("[Reports] Revenue error:", err);
     res.status(500).json({ error: "Failed to fetch revenue report" });

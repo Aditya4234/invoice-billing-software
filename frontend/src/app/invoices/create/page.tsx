@@ -188,7 +188,11 @@ export default function CreateInvoicePage() {
       const created = await createInvoice({
         clientName: form.client.name,
         email: form.client.email,
+        clientAddress: form.client.address,
+        clientCity: form.client.city,
+        clientState: form.client.state,
         amount: totals.grandTotal || 0,
+        paidAmount: form.paidAmount,
         dueDate: form.dueDate,
         status: "draft",
         invoiceDate: form.issueDate,
@@ -201,7 +205,7 @@ export default function CreateInvoicePage() {
         notes: form.notes,
       });
       setSaved(true);
-      setTimeout(() => window.location.href = `/invoices/${created._id}`, 1500);
+      setTimeout(() => window.location.href = `/invoices/${created.id || created._id}`, 1500);
     } catch (err) {
       console.error("Failed to save draft", err);
       alert("Failed to save draft. Please check all required fields and try again.");

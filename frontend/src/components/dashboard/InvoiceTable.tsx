@@ -93,7 +93,7 @@ export default function InvoiceTable({ invoices }: InvoiceTableProps) {
     );
   };
 
-  const statuses = ["all", "paid", "pending", "overdue", "draft", "cancelled"];
+  const statuses = ["all", "paid", "pending", "overdue", "draft"];
 
   return (
     <>

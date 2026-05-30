@@ -66,14 +66,14 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 router.post("/", async (req: Request, res: Response) => {
   try {
-    const { name, email, phone, company, address, gstin, status } = req.body;
+    const { name, email, phone, company, address, pincode, gstin, status } = req.body;
     if (!name || !email) {
       res.status(400).json({ error: "Missing required fields: name, email" });
       return;
     }
     const client = await Client.create({
       name, email, phone: phone || "", company: company || "",
-      address: address || "", gstin, status: status || "active",
+      address: address || "", pincode: pincode || "", gstin, status: status || "active",
     });
     await Activity.create({ type: "client", message: `New client registered: ${client.name}`, user: "Admin" });
     res.status(201).json(client);

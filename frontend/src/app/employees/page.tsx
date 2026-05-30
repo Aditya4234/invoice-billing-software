@@ -16,7 +16,7 @@ import { getEmployees, getDepartments, deleteEmployee, getApiData } from "@/lib/
 import type { Employee, Department } from "@/types";
 
 const statusVariant: Record<string, "success" | "danger" | "warning" | "default"> = {
-  active: "success", inactive: "default", suspended: "warning", terminated: "danger", resigned: "default",
+  active: "success", inactive: "default", "on-leave": "warning",
 };
 
 const ITEMS_PER_PAGE = 8;
@@ -40,7 +40,7 @@ function backendToEmployee(b: any): Employee {
     designation: b.position,
     designationId: "DSG-000",
     employmentType: "full-time",
-    status: b.status === "on-leave" ? "active" : b.status,
+    status: b.status,
     joiningDate: b.joinDate,
     bankDetails: {
       accountNumber: b.bankAccount || "",
@@ -187,7 +187,7 @@ export default function EmployeesPage() {
             {departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
           </select>
           <div className="h-6 w-px bg-gray-200 mx-1" />
-          {["all", "active", "inactive", "suspended", "terminated", "resigned"].map((s) => (
+          {["all", "active", "inactive", "on-leave"].map((s) => (
             <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }} className={cn("rounded-lg px-3 py-1.5 text-xs font-medium transition whitespace-nowrap capitalize", statusFilter === s ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200")}>{s}</button>
           ))}
         </div>

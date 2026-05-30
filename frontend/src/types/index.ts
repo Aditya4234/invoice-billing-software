@@ -4,7 +4,7 @@ export interface Invoice {
   email: string;
   amount: number;
   dueDate: string;
-  status: "paid" | "pending" | "overdue" | "draft" | "cancelled";
+  status: "paid" | "pending" | "overdue" | "draft";
   createdAt: string;
   items?: number;
 }
@@ -74,12 +74,12 @@ export interface PaginationConfig {
 // ====== Employee Management Types ======
 
 export type EmploymentType = "full-time" | "part-time" | "contract" | "intern" | "probation";
-export type EmployeeStatus = "active" | "inactive" | "suspended" | "terminated" | "resigned";
+export type EmployeeStatus = "active" | "inactive" | "on-leave";
 export type Gender = "male" | "female" | "other";
 export type LeaveType = "sick" | "casual" | "earned" | "maternity" | "paternity" | "unpaid";
-export type LeaveStatus = "pending" | "approved" | "rejected" | "cancelled";
+export type LeaveStatus = "pending" | "approved" | "rejected";
 export type AttendanceStatus = "present" | "absent" | "half-day" | "wfh" | "leave" | "holiday";
-export type PayrollStatus = "draft" | "processed" | "paid" | "cancelled";
+export type PayrollStatus = "paid" | "pending" | "processing";
 
 export interface Department {
   id: string;

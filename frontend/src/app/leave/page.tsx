@@ -206,7 +206,7 @@ export default function LeavePage() {
           />
         </div>
         <div className="flex items-center gap-2 overflow-x-auto">
-          {(["all", "pending", "approved", "rejected", "cancelled"] as const).map((s) => (
+          {(["all", "pending", "approved", "rejected"] as const).map((s) => (
             <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }}
               className={cn("rounded-lg px-3 py-1.5 text-xs font-medium transition capitalize whitespace-nowrap",
                 statusFilter === s ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200")}

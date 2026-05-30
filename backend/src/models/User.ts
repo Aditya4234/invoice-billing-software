@@ -22,7 +22,18 @@ const UserSchema = new Schema<IUser>(
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform(_doc, ret: Record<string, unknown>) {
+        ret.id = String(ret._id);
+        delete ret.__v;
+        delete ret._id;
+        return ret;
+      },
+    },
+  }
 );
 
 UserSchema.pre("save", async function () {

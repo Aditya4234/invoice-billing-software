@@ -12,8 +12,9 @@ import { Badge } from "@/components/ui/Badge";
 import { getEmployee, getAttendance, getPayrollRecords, getLeaveRequests, getApiData } from "@/lib/api";
 import type { Employee, LeaveRequest, PayrollRun, LeaveType, LeaveStatus } from "@/types";
 
+const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const statusVariant: Record<string, "success" | "danger" | "warning" | "default"> = {
-  active: "success", inactive: "default", suspended: "warning", terminated: "danger", resigned: "default",
+  active: "success", inactive: "default", "on-leave": "warning",
 };
 
 export default function EmployeeDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -48,7 +49,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           designation: b.position,
           designationId: "DSG-000",
           employmentType: "full-time",
-          status: b.status === "on-leave" ? "active" : b.status,
+          status: b.status,
           joiningDate: b.joinDate,
           bankDetails: {
             accountNumber: b.bankAccount || "",
@@ -94,7 +95,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           employeeId: mappedEmp.employeeId,
           employeeName: mappedEmp.firstName + " " + mappedEmp.lastName,
           department: mappedEmp.department,
-          month: 4,
+          month: months.indexOf(p.month),
           year: p.year,
           basic: p.basicSalary,
           hra: p.allowances * 0.4,
@@ -108,7 +109,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           otherDeductions: 0,
           totalDeductions: p.deductions,
           netPay: p.netSalary,
-          status: p.status === "processing" ? "processed" : p.status,
+          status: p.status,
           paidDate: p.paidDate,
           paymentMode: "Bank Transfer"
         } as PayrollRun));
@@ -319,7 +320,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
               <tbody className="divide-y divide-gray-50">
                 {empPayroll.map((p) => (
                   <tr key={p.id} className="transition hover:bg-blue-50/30">
-                    <td className="px-4 py-3 first:pl-4 text-sm text-gray-900">{["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][p.month - 1]} {p.year}</td>
+                    <td className="px-4 py-3 first:pl-4 text-sm text-gray-900">{months[p.month] ? months[p.month].substring(0,3) : "—"} {p.year}</td>
                     <td className="px-4 py-3 text-sm font-semibold text-gray-900">₹{p.grossPay.toLocaleString()}</td>
                     <td className="px-4 py-3 text-sm text-rose-600">₹{p.totalDeductions.toLocaleString()}</td>
                     <td className="px-4 py-3 text-sm font-semibold text-emerald-600">₹{p.netPay.toLocaleString()}</td>

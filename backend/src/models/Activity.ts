@@ -20,7 +20,18 @@ const ActivitySchema = new Schema<IActivity>(
     timestamp: { type: String, default: "Just now" },
     user: { type: String },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform(_doc, ret: Record<string, unknown>) {
+        ret.id = String(ret._id);
+        delete ret.__v;
+        delete ret._id;
+        return ret;
+      },
+    },
+  }
 );
 
 export default mongoose.model<IActivity>("Activity", ActivitySchema);

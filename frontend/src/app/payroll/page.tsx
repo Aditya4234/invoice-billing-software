@@ -15,7 +15,7 @@ import { getPayrollRecords, getAllEmployees, getApiData } from "@/lib/api";
 import type { PayrollRun, PayrollStatus, Employee } from "@/types";
 
 const statusBadge: Record<string, "success" | "warning" | "danger" | "default"> = {
-  paid: "success", processed: "warning", draft: "default", cancelled: "danger",
+  paid: "success", processing: "warning", pending: "default",
 };
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -44,7 +44,7 @@ export default function PayrollPage() {
         firstName: b.firstName,
         lastName: b.lastName,
         department: b.department,
-        status: b.status === "on-leave" ? "active" : b.status,
+        status: b.status,
       } as Employee));
       setEmployees(currentEmps);
     });
@@ -58,7 +58,7 @@ export default function PayrollPage() {
           employeeId: p.employeeId.toUpperCase(),
           employeeName: p.employeeName,
           department: emp ? emp.department : "Unknown",
-          month: 4, // hardcoding for UI matching selectedMonth
+          month: months.indexOf(p.month),
           year: p.year,
           basic: p.basicSalary,
           hra: p.allowances * 0.4,
@@ -72,7 +72,7 @@ export default function PayrollPage() {
           otherDeductions: 0,
           totalDeductions: p.deductions,
           netPay: p.netSalary,
-          status: p.status === "processing" ? "processed" : p.status,
+          status: p.status,
           paidDate: p.paidDate,
           paymentMode: "Bank Transfer"
         } as PayrollRun;
@@ -154,7 +154,7 @@ export default function PayrollPage() {
           />
         </div>
         <div className="flex items-center gap-2 overflow-x-auto">
-          {(["all", "paid", "processed", "draft", "cancelled"] as const).map((s) => (
+          {(["all", "paid", "pending", "processing"] as const).map((s) => (
             <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }}
               className={cn("rounded-lg px-3 py-1.5 text-xs font-medium transition capitalize whitespace-nowrap",
                 statusFilter === s ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200")}

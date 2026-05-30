@@ -162,7 +162,7 @@ export async function getDepartments(search?: string, status?: string) {
   const params = new URLSearchParams();
   if (search) params.set("search", search);
   if (status) params.set("status", status);
-  return fetchJSON<any[]>("/departments");
+  return fetchJSON<any[]>("/departments?" + params);
 }
 
 export async function getAttendance(employeeId?: string, date?: string) {
